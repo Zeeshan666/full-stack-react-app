@@ -27,6 +27,7 @@ handleSubmit=(value)=>{
     console.log("current state is" + JSON.stringify(value));
     alert("current state is" +JSON.stringify(value));
     this.props.resetFeedbackForm();
+    this.props.postFeedback(value)
 }
 
     render(){

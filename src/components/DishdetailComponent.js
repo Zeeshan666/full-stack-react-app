@@ -4,6 +4,9 @@ import { Card, CardImg, CardImgOverlay, CardText, CardBody, Row, Col, Label,
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
+
+import { baseUrl } from '../redux/baseUrl';
 
 import { Loading } from './LoadingComponent';
 const required = (val) => val && val.length;
@@ -29,7 +32,7 @@ class CommentForm extends Component {
 
     handleSubmit(values) {
         console.log('Current State is: ' + JSON.stringify(values));
-        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
 
 
     }
@@ -118,20 +121,29 @@ class CommentForm extends Component {
 function RenderDish({dish}) {
     return(
         <div className="col-12 col-md-5 m-1">
+
+        <FadeTransform
+                in
+                transformProps={{
+                    exitTransform: 'scale(0.5) translateY(-50%)'
+                }}>
             <Card>
-                <CardImg top src={dish.image} alt={dish.name} />
+                <CardImg top src={ baseUrl+ dish.image} alt={dish.name} />
                 <CardBody>
                     <CardTitle>{dish.name}</CardTitle>
                     <CardText>{dish.description}</CardText>
                 </CardBody>
             </Card>
+            </FadeTransform>
         </div>
     );
 }
 
-function RenderComments({comments,addComment,dishId}) {
+function RenderComments({comments,postComment,dishId}) {
+    
     const output = comments.map((entry) => {
         return (
+        <Fade in>           
             <li key={entry.id} className="mt-3">
                 {entry.comment}
                 <br/>
@@ -139,15 +151,19 @@ function RenderComments({comments,addComment,dishId}) {
                 {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'})
                     .format(new Date(Date.parse(entry.date)))}
             </li>
+        </Fade>
         );
+        
     });
     return (
         <div className="col-12 col-md-5 m-1">
             <h4>Comments</h4>
             <ul className="list-unstyled">
+            <Stagger in>
                 {output}
+                </Stagger>
             </ul>
-            <CommentForm dishId={dishId} addComment={addComment}/>
+            <CommentForm dishId={dishId} postComment={postComment}/>
         </div>
     );
 }
@@ -190,7 +206,7 @@ const  DishDetail = (props) => {
                 <div className="row">
                     <RenderDish dish={props.dish} />
                     <RenderComments comments={props.comments} 
-                    addComment={props.addComment}
+                    postComment={props.postComment}
         dishId={props.dish.id}
                     />
                 </div>
